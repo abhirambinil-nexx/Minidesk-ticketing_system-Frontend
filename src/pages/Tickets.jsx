@@ -7,21 +7,49 @@ function Tickets() {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchTickets();
-  }, []);
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("");
+  const [priority, setPriority] = useState("");
+  const [sort, setSort] = useState("createdAt:DESC");
 
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+
+  const [pagination, setPagination] = useState({
+    total: 0,
+    totalPages: 1,
+  });
+  useEffect(() => {
+    setLoading(true);
+    fetchTickets();
+  }, [search, status, priority, sort, page]);
   async function fetchTickets() {
     try {
-      const response = await getTickets();
+      const response = await getTickets({
+        search,
+        status,
+        priority,
+        sort,
+        page,
+        limit,
+      });
 
-      if (response.success) {
-        setTickets(response.data);
+      if (response?.success) {
+        setTickets(response?.data || []);
+
+        setPagination(
+          response?.pagination || {
+            total: 0,
+            totalPages: 1,
+          },
+        );
       } else {
-        alert(response.message);
+        setTickets([]);
+        alert(response?.message || "Failed to fetch tickets");
       }
     } catch (error) {
       console.error(error);
+      setTickets([]);
       alert("Failed to fetch tickets");
     } finally {
       setLoading(false);
@@ -62,8 +90,56 @@ function Tickets() {
           <button className="tickets-header__button">Create Ticket</button>
         </Link>
       </div>
+      <div className="tickets-filters">
+        <input
+          type="text"
+          placeholder="Search tickets..."
+          value={search}
+          onChange={(e) => {
+            setPage(1);
+            setSearch(e.target.value);
+          }}
+        />
 
-      {tickets.length === 0 ? (
+        <select
+          value={status}
+          onChange={(e) => {
+            setPage(1);
+            setStatus(e.target.value);
+          }}
+        >
+          <option value="">All Status</option>
+          <option value="open">Open</option>
+          <option value="in_progress">In Progress</option>
+          <option value="resolved">Resolved</option>
+          <option value="closed">Closed</option>
+          <option value="reopened">Reopened</option>
+        </select>
+
+        <select
+          value={priority}
+          onChange={(e) => {
+            setPage(1);
+            setPriority(e.target.value);
+          }}
+        >
+          <option value="">All Priority</option>
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+          <option value="urgent">Urgent</option>
+        </select>
+
+        <select value={sort} onChange={(e) => setSort(e.target.value)}>
+          <option value="createdAt:DESC">Newest</option>
+          <option value="createdAt:ASC">Oldest</option>
+          <option value="priority:ASC">Priority ↑</option>
+          <option value="priority:DESC">Priority ↓</option>
+          <option value="title:ASC">Title A-Z</option>
+          <option value="title:DESC">Title Z-A</option>
+        </select>
+      </div>
+      {(tickets || []).length === 0 ? (
         <p className="tickets-page__empty">No tickets found.</p>
       ) : (
         <table
@@ -123,6 +199,25 @@ function Tickets() {
           </tbody>
         </table>
       )}
+      <div className="tickets-pagination">
+        <button
+          disabled={page === 1}
+          onClick={() => setPage((prev) => prev - 1)}
+        >
+          Previous
+        </button>
+
+        <span>
+          Page {page} of {pagination.totalPages}
+        </span>
+
+        <button
+          disabled={page >= pagination.totalPages}
+          onClick={() => setPage((prev) => prev + 1)}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 }

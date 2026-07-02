@@ -4,8 +4,16 @@ function getToken() {
   return localStorage.getItem("token");
 }
 
-export async function getTickets() {
-  const response = await fetch(API_URL, {
+export async function getTickets(filters = {}) {
+  const params = new URLSearchParams();
+
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      params.append(key, value);
+    }
+  });
+
+  const response = await fetch(`${API_URL}?${params.toString()}`, {
     headers: {
       Authorization: `Bearer ${getToken()}`,
     },
@@ -13,7 +21,7 @@ export async function getTickets() {
 
   return await response.json();
 }
-
+  
 export async function getTicket(id) {
   const response = await fetch(`${API_URL}/${id}`, {
     headers: {
