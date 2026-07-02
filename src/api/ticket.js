@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5000/tickets";
+const API_URL = "http://localhost:5000/api/tickets";
 
 function getToken() {
   return localStorage.getItem("token");

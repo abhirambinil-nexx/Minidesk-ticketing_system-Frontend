@@ -14,8 +14,9 @@ export default function CommentForm({ onAdd }) {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="comment-form" onSubmit={handleSubmit}>
       <textarea
+        className="comment-form__textarea"
         rows="4"
         placeholder="Write a comment..."
         value={comment}
@@ -24,7 +25,9 @@ export default function CommentForm({ onAdd }) {
 
       <br />
 
-      <button type="submit">Add Comment</button>
+      <button className="comment-form__submit" type="submit">
+        Add Comment
+      </button>
     </form>
   );
 }

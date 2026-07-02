@@ -28,30 +28,31 @@ export default function CommentSection({ ticketId }) {
   }
 
   return (
-    <div>
-      <h2>Comments</h2>
+    <div className="comment-section">
+      <h2 className="comment-section__title">Comments</h2>
 
       <CommentForm onAdd={handleAdd} />
 
       <br />
 
       {comments.length === 0 ? (
-        <p>No comments yet.</p>
+        <p className="comment-section__empty">No comments yet.</p>
       ) : (
         comments.map((item) => (
           <div
             key={item.id}
+            className="comment-section__item"
             style={{
               border: "1px solid gray",
               padding: "10px",
               marginBottom: "10px",
             }}
           >
-            <h4>{item.author?.name}</h4>
+            <h4 className="comment-section__author">{item.author?.name}</h4>
 
-            <p>{item.body}</p>
+            <p className="comment-section__body">{item.body}</p>
 
-            <small>
+            <small className="comment-section__meta">
               {new Date(item.createdAt).toLocaleString()}
             </small>
           </div>

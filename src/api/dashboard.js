@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5000/dashboard";
+const API_URL = "http://localhost:5000/api/dashboard";
 
 function getToken() {
   return localStorage.getItem("accessToken") || localStorage.getItem("token");

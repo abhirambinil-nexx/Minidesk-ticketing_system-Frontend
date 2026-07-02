@@ -38,72 +38,60 @@ export default function Users() {
   }
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>User Management</h1>
+    <div className="users-page" style={{ padding: "20px" }}>
+      <h1 className="users-page__title">User Management</h1>
 
       <table
+        className="users-page__table"
         border="1"
         cellPadding="10"
         cellSpacing="0"
         width="100%"
       >
         <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Status</th>
-            <th>Change Role</th>
-            <th>Action</th>
+          <tr className="users-page__row users-page__row--head">
+            <th className="users-page__cell">Name</th>
+            <th className="users-page__cell">Email</th>
+            <th className="users-page__cell">Role</th>
+            <th className="users-page__cell">Status</th>
+            <th className="users-page__cell">Change Role</th>
+            <th className="users-page__cell">Action</th>
           </tr>
         </thead>
 
         <tbody>
           {users.map((user) => (
-            <tr key={user.id}>
-              <td>{user.name}</td>
+            <tr className="users-page__row" key={user.id}>
+              <td className="users-page__cell">{user.name}</td>
 
-              <td>{user.email}</td>
+              <td className="users-page__cell">{user.email}</td>
 
-              <td>{user.role}</td>
+              <td className="users-page__cell">{user.role}</td>
 
-              <td>
+              <td className="users-page__cell">
                 {user.isActive ? "Active" : "Inactive"}
               </td>
 
-              <td>
+              <td className="users-page__cell">
                 <select
+                  className="users-page__select"
                   value={user.role}
-                  onChange={(e) =>
-                    handleRoleChange(
-                      user.id,
-                      e.target.value
-                    )
-                  }
+                  onChange={(e) => handleRoleChange(user.id, e.target.value)}
                 >
-                  <option value="requester">
-                    Requester
-                  </option>
+                  <option value="requester">Requester</option>
 
-                  <option value="agent">
-                    Agent
-                  </option>
+                  <option value="agent">Agent</option>
 
-                  <option value="admin">
-                    Admin
-                  </option>
+                  <option value="admin">Admin</option>
                 </select>
               </td>
 
-              <td>
+              <td className="users-page__cell">
                 <button
-                  onClick={() =>
-                    handleToggleUser(user)
-                  }
+                  className="users-page__button"
+                  onClick={() => handleToggleUser(user)}
                 >
-                  {user.isActive
-                    ? "Deactivate"
-                    : "Activate"}
+                  {user.isActive ? "Deactivate" : "Activate"}
                 </button>
               </td>
             </tr>

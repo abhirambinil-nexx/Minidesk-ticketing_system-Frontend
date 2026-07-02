@@ -2,7 +2,7 @@ import { useState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import { googleLogin, signup } from "../api/auth";
 import { Link, useNavigate } from "react-router-dom";
-
+import "../style/Signup.css";
 export default function Signup() {
   const navigate = useNavigate();
 
@@ -48,85 +48,106 @@ export default function Signup() {
       alert("Something went wrong");
     }
   };
-
   return (
-    <div>
-      <h1>Signup</h1>
+    <div className="signup-page">
+      <div className="signup-page__card">
+        <div className="signup-page__left">
+          <h1 className="signup-page__title">Get Started Now</h1>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="name"
-          placeholder="Name"
-          onChange={handleChange}
-        />
+          <p className="signup-page__subtitle">
+            Create your account to continue
+          </p>
 
-        <br />
-        <br />
-
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          onChange={handleChange}
-        />
-
-        <br />
-        <br />
-
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          onChange={handleChange}
-        />
-
-        <br />
-        <br />
-
-        <button>Signup</button>
-
-        <div style={{ margin: "20px 0 12px" }}>
-          <p style={{ marginBottom: "8px" }}>Or continue with Google</p>
-          {import.meta.env.VITE_GOOGLE_CLIENT_ID ? (
-            <GoogleLogin
-              onSuccess={async (credentialResponse) => {
-                try {
-                  const data = await googleLogin(credentialResponse.credential);
-
-                  const token = data.accessToken || data.token;
-
-                  if (token) {
-                    localStorage.setItem("accessToken", token);
-                    localStorage.setItem("token", token);
-
-                    if (data.user) {
-                      localStorage.setItem("user", JSON.stringify(data.user));
-                    }
-
-                    alert(data.message || "Google signup successful");
-                    navigate("/dashboard", { replace: true });
-                  } else {
-                    alert(data.error || "Google signup failed");
-                  }
-                } catch (error) {
-                  console.error(error);
-                  alert("Google signup failed");
-                }
-              }}
-              onError={() => alert("Google signup failed")}
+          <form className="signup-page__form" onSubmit={handleSubmit}>
+            <label className="signup-page__label">Name</label>
+            <input
+              className="signup-page__input"
+              type="text"
+              name="name"
+              placeholder="Enter your name"
+              onChange={handleChange}
             />
-          ) : (
-            <p style={{ color: "crimson", marginTop: "8px" }}>
-              Google sign-in is not configured yet.
+
+            <label className="signup-page__label">Email Address</label>
+            <input
+              className="signup-page__input"
+              type="email"
+              name="email"
+              placeholder="Enter your email"
+              onChange={handleChange}
+            />
+
+            <label className="signup-page__label">Password</label>
+            <input
+              className="signup-page__input"
+              type="password"
+              name="password"
+              placeholder="Enter your password"
+              onChange={handleChange}
+            />
+
+            <button className="signup-page__button" type="submit">
+              Sign Up
+            </button>
+
+            <div className="signup-page__social">
+              <p className="signup-page__social-title">
+                Or continue with Google
+              </p>
+
+              {import.meta.env.VITE_GOOGLE_CLIENT_ID ? (
+                <div className="signup-page__google">
+                  <GoogleLogin
+                    onSuccess={async (credentialResponse) => {
+                      try {
+                        const data = await googleLogin(
+                          credentialResponse.credential,
+                        );
+
+                        const token = data.accessToken || data.token;
+
+                        if (token) {
+                          localStorage.setItem("accessToken", token);
+                          localStorage.setItem("token", token);
+
+                          if (data.user) {
+                            localStorage.setItem(
+                              "user",
+                              JSON.stringify(data.user),
+                            );
+                          }
+
+                          alert(data.message || "Google signup successful");
+                          navigate("/dashboard", { replace: true });
+                        } else {
+                          alert(data.error || "Google signup failed");
+                        }
+                      } catch (error) {
+                        console.error(error);
+                        alert("Google signup failed");
+                      }
+                    }}
+                    onError={() => alert("Google signup failed")}
+                  />
+                </div>
+              ) : (
+                <p className="signup-page__warning">
+                  Google sign-in is not configured yet.
+                </p>
+              )}
+            </div>
+
+            <p className="signup-page__switch-text">
+              Already have an account?
+              <Link className="signup-page__switch-link" to="/login">
+                Login
+              </Link>
             </p>
-          )}
+          </form>
         </div>
 
-        <p>
-          Already have an account? <Link to="/login">Login</Link>
-        </p>
-      </form>
+        <div className="signup-page__right"></div>
+      </div>
     </div>
   );
 }

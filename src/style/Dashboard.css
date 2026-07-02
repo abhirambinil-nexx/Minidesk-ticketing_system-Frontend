@@ -1,0 +1,99 @@
+/* ===========================
+   Dashboard
+=========================== */
+
+.dashboard {
+  min-height: 100vh;
+  padding: 35px;
+  background: #f5f7fb;
+  font-family: "Inter", sans-serif;
+}
+
+/* ===========================
+   Header
+=========================== */
+
+.dashboard__welcome {
+  font-size: 2rem;
+  color: #1e293b;
+  font-weight: 700;
+}
+
+.dashboard__role {
+  margin-top: 8px;
+  color: #64748b;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.dashboard__divider {
+  margin: 30px 0;
+  border: none;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* ===========================
+   Dashboard Cards
+=========================== */
+
+.dashboard-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 25px;
+  margin-bottom: 45px;
+}
+
+/* ===========================
+   Section Title
+=========================== */
+
+.dashboard__section-title {
+  margin-bottom: 20px;
+  color: #1f2937;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.dashboard__table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+.dashboard__row--head {
+  background: #496e3bec;
+  color: white;
+}
+
+.dashboard__cell {
+  padding: 18px;
+  text-align: left;
+  font-size: 15px;
+}
+
+.dashboard__row {
+  border-bottom: 1px solid #ececec;
+  transition: 0.25s;
+}
+
+.dashboard__row:last-child {
+  border-bottom: none;
+}
+
+.dashboard__loading,
+.dashboard__error,
+.dashboard__empty-state {
+  text-align: center;
+  margin-top: 100px;
+  color: #64748b;
+  font-size: 20px;
+}
+
+.dashboard__error {
+  color: #ef4444;
+}

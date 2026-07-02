@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getDashboard } from "../api/dashboard";
 import DashboardCard from "../components/DashboardCard";
+import "../style/Dashboard.css";
 
 export default function Dashboard() {
   const [dashboard, setDashboard] = useState(null);
@@ -72,23 +73,25 @@ export default function Dashboard() {
       ) : (
         <table className="dashboard__table">
           <thead>
-            <tr>
-              <th>Title</th>
-              <th>Status</th>
-              <th>Priority</th>
-              <th>Category</th>
-              <th>Created</th>
+            <tr className="dashboard__row dashboard__row--head">
+              <th className="dashboard__cell">Title</th>
+              <th className="dashboard__cell">Status</th>
+              <th className="dashboard__cell">Priority</th>
+              <th className="dashboard__cell">Category</th>
+              <th className="dashboard__cell">Created</th>
             </tr>
           </thead>
 
           <tbody>
             {dashboard.recentTickets?.map((ticket) => (
-              <tr key={ticket.id}>
-                <td>{ticket.title}</td>
-                <td>{ticket.status}</td>
-                <td>{ticket.priority}</td>
-                <td>{ticket.category}</td>
-                <td>{new Date(ticket.createdAt).toLocaleDateString()}</td>
+              <tr className="dashboard__row" key={ticket.id}>
+                <td className="dashboard__cell">{ticket.title}</td>
+                <td className="dashboard__cell">{ticket.status}</td>
+                <td className="dashboard__cell">{ticket.priority}</td>
+                <td className="dashboard__cell">{ticket.category}</td>
+                <td className="dashboard__cell">
+                  {new Date(ticket.createdAt).toLocaleDateString()}
+                </td>
               </tr>
             ))}
           </tbody>

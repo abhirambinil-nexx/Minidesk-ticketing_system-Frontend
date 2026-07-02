@@ -1,7 +1,7 @@
-const API_URL = "http://localhost:5000/users";
+const API_URL = "http://localhost:5000/api/users";
 
 function getToken() {
-  return localStorage.getItem("token");
+  return localStorage.getItem("accessToken");
 }
 
 export async function getUsers() {
@@ -16,6 +16,16 @@ export async function getUsers() {
 
 export async function getUser(id) {
   const response = await fetch(`${API_URL}/${id}`, {
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+    },
+  });
+
+  return await response.json();
+}
+
+export async function getAgents() {
+  const response = await fetch(`${API_URL}/agents`, {
     headers: {
       Authorization: `Bearer ${getToken()}`,
     },
@@ -84,3 +94,4 @@ export async function deactivateUser(id) {
 
   return await response.json();
 }
+  

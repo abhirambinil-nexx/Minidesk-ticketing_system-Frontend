@@ -1,0 +1,99 @@
+
+.navbar {
+  height: 70px;
+  background: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 35px;
+  border-bottom: 1px solid #e5e7eb;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar__left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.navbar__brand {
+  font-size: 1.6rem;
+  font-weight: 700;
+  border-color: #496e3b1f;
+  color: #496e3b;
+  margin-right: 20px;
+}
+
+.navbar__link {
+  text-decoration: none;
+  color: #475569;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 10px 14px;
+  border-radius: 10px;
+  transition: 0.25s;
+}
+
+.navbar__link:hover {
+  background: #496e3bad;
+  color: #ffffff;
+}
+
+
+.navbar__right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.navbar__user {
+  color: #475569;
+  font-weight: 600;
+  background: #f8fafc;
+  padding: 10px 16px;
+  border-radius: 30px;
+}
+
+.navbar__logout {
+  border: none;
+  outline: none;
+  cursor: pointer;
+  background: #496e3b;
+  color: white;
+  padding: 11px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.navbar__logout:hover {
+  background: #496e3bec;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(79, 70, 229, 0.3);
+}
+
+/* ===========================
+   Responsive
+=========================== */
+
+@media (max-width: 900px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    height: auto;
+    padding: 18px;
+    gap: 15px;
+  }
+
+  .navbar__left {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .navbar__right {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

@@ -1,5 +1,5 @@
-const API = "http://localhost:5000/auth";
-const GOOGLE_API = "http://localhost:5000/api/auth/google";
+const API = "http://localhost:5000/api/auth";
+const GOOGLE_API = "http://localhost:5000/api/oauth/google";
 
 export async function signup(userData) {
   const response = await fetch(`${API}/signup`, {

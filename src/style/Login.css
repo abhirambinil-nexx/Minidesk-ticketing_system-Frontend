@@ -1,0 +1,174 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.login-page {
+  min-height: 100vh;
+  background: #f5f5f2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Inter", sans-serif;
+}
+
+.login-page__card {
+  width: 1120px;
+  height: 620px;
+  background: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
+}
+
+.login-page__left {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 70px 80px;
+}
+
+.login-page__title {
+  font-size: 36px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 10px;
+}
+
+.login-page__subtitle {
+  color: #7b7b7b;
+  font-size: 15px;
+  margin-bottom: 40px;
+}
+
+.login-page__form {
+  width: 100%;
+  max-width: 340px;
+}
+
+.login-page__input {
+  width: 100%;
+  height: 40px;
+  border: 1px solid #dddddd;
+  border-radius: 8px;
+  padding: 0 15px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  transition: 0.2s;
+  outline: none;
+}
+
+.login-page__input::placeholder {
+  color: #b1b1b1;
+}
+
+.login-page__input:focus {
+  border-color: #496e3b;
+  box-shadow: 0 0 0 3px #496e3b1f;
+}
+
+.login-page__button {
+  width: 100%;
+  height: 46px;
+  border: none;
+  border-radius: 8px;
+  background: #446a35;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 5px;
+  transition: 0.2s;
+}
+
+.login-page__button:hover {
+  background: #35572a;
+}
+
+.login-page__social {
+  margin-top: 30px;
+}
+
+.login-page__social-title {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  color: #999;
+
+  font-size: 13px;
+
+  margin-bottom: 18px;
+}
+
+.login-page__social-title::before,
+.login-page__social-title::after {
+  content: "";
+
+  flex: 1;
+
+  height: 1px;
+
+  background: #e3e3e3;
+}
+
+.login-page__social iframe {
+  width: 100%;
+}
+.login-page__google {
+  display: flex;
+  justify-content: center;
+  margin-top: 25px;
+}
+
+.login-page__switch-text {
+  text-align: center;
+  margin-top: 20px;
+  color: #888;
+  font-size: 14px;
+}
+
+.login-page__switch-link {
+  color: #446a35;
+  text-decoration: none;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.login-page__switch-link:hover {
+  text-decoration: underline;
+}
+
+.login-page__right {
+  background-image: url("../assets/plant.png"); /* change path if needed */
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+@media (max-width: 950px) {
+  .login-page__card {
+    width: 95%;
+
+    height: auto;
+
+    grid-template-columns: 1fr;
+  }
+
+  .login-page__right {
+    display: none;
+  }
+
+  .login-page__left {
+    padding: 45px;
+  }
+
+  .login-page__form {
+    max-width: 100%;
+  }
+}

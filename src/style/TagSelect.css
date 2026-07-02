@@ -1,0 +1,42 @@
+.tag-select {
+  margin: 20px 0;
+}
+
+.tag-select__label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.tag-select__container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.tag-select__item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.tag-select__item input {
+  cursor: pointer;
+}
+
+.tag-select__badge {
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.tag-select__loading,
+.tag-select__empty {
+  color: #6b7280;
+  font-size: 14px;
+}

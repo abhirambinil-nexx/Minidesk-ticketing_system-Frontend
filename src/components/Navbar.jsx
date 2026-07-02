@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-
+import "../style/Navbar.css";
 export default function Navbar() {
   const user = JSON.parse(localStorage.getItem("user"));
   const isAdmin = user?.role === "admin";
