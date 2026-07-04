@@ -1,58 +1,60 @@
 import { useEffect, useState } from "react";
-import { getTickets, deleteTicket } from "../api/ticket";
+import { getTickets, updateTicket, deleteTicket } from "../api/ticket";
 import { Link } from "react-router-dom";
 import "../style/Tickets.css";
 
 function Tickets() {
-  const [tickets, setTickets] = useState([]);
+  const [allTickets, setAllTickets] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [search, setSearch] = useState("");
-  const [status, setStatus] = useState("");
   const [priority, setPriority] = useState("");
-  const [sort, setSort] = useState("createdAt:DESC");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  const [page, setPage] = useState(1);
-  const [limit] = useState(10);
+  const statuses = ["open", "in_progress", "resolved", "closed"];
 
-  const [pagination, setPagination] = useState({
-    total: 0,
-    totalPages: 1,
-  });
   useEffect(() => {
-    setLoading(true);
     fetchTickets();
-  }, [search, status, priority, sort, page]);
+  }, [search, priority]);
+
   async function fetchTickets() {
     try {
+      setLoading(true);
       const response = await getTickets({
         search,
-        status,
         priority,
-        sort,
-        page,
-        limit,
+        limit: 1000,
       });
 
       if (response?.success) {
-        setTickets(response?.data || []);
-
-        setPagination(
-          response?.pagination || {
-            total: 0,
-            totalPages: 1,
-          },
-        );
+        setAllTickets(response?.data || []);
       } else {
-        setTickets([]);
-        alert(response?.message || "Failed to fetch tickets");
+        setError(response?.message || "Failed to fetch tickets");
       }
     } catch (error) {
       console.error(error);
-      setTickets([]);
-      alert("Failed to fetch tickets");
+      setError("Failed to fetch tickets");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleStatusChange(ticketId, newStatus) {
+    try {
+      const response = await updateTicket(ticketId, { status: newStatus });
+
+      if (response.success) {
+        setAllTickets((prev) =>
+          prev.map((t) => (t.id === ticketId ? response.data : t)),
+        );
+        setSuccess("Ticket status updated");
+        setTimeout(() => setSuccess(""), 3000);
+      } else {
+        setError(response.message || "Failed to update status");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Failed to update status");
     }
   }
 
@@ -67,156 +69,211 @@ function Tickets() {
       const response = await deleteTicket(id);
 
       if (response.success) {
-        setTickets((prev) => prev.filter((ticket) => ticket.id !== id));
+        setAllTickets((prev) => prev.filter((t) => t.id !== id));
+        setSuccess("Ticket deleted");
+        setTimeout(() => setSuccess(""), 3000);
       } else {
-        alert(response.message);
+        setError(response.message);
       }
     } catch (error) {
       console.error(error);
-      alert("Unable to delete ticket");
+      setError("Unable to delete ticket");
     }
   }
 
+  const ticketsByStatus = {};
+  statuses.forEach((s) => {
+    ticketsByStatus[s] = allTickets.filter((t) => t.status === s);
+  });
+
   if (loading) {
-    return <h2 className="tickets-page__loading">Loading tickets...</h2>;
+    return <h2 className="tickets__loading">Loading tickets...</h2>;
   }
 
   return (
     <div className="tickets-container">
-      <div className="tickets-header">
-        <h1 className="tickets-header__title">Tickets</h1>
+      <div className="tickets__header">
+        <h1 className="tickets__title">Tickets</h1>
 
-        <Link className="tickets-header__link" to="/tickets/new">
-          <button className="tickets-header__button">Create Ticket</button>
-        </Link>
+        <div className="tickets__header-actions">
+          <Link to="/tickets/new">
+            <button className="tickets__create-btn">+ Create Ticket</button>
+          </Link>
+        </div>
       </div>
-      <div className="tickets-filters">
-        <input
-          type="text"
-          placeholder="Search tickets..."
-          value={search}
-          onChange={(e) => {
-            setPage(1);
-            setSearch(e.target.value);
-          }}
-        />
 
-        <select
-          value={status}
-          onChange={(e) => {
-            setPage(1);
-            setStatus(e.target.value);
-          }}
-        >
-          <option value="">All Status</option>
-          <option value="open">Open</option>
-          <option value="in_progress">In Progress</option>
-          <option value="resolved">Resolved</option>
-          <option value="closed">Closed</option>
-          <option value="reopened">Reopened</option>
-        </select>
-
-        <select
-          value={priority}
-          onChange={(e) => {
-            setPage(1);
-            setPriority(e.target.value);
-          }}
-        >
-          <option value="">All Priority</option>
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
-          <option value="urgent">Urgent</option>
-        </select>
-
-        <select value={sort} onChange={(e) => setSort(e.target.value)}>
-          <option value="createdAt:DESC">Newest</option>
-          <option value="createdAt:ASC">Oldest</option>
-          <option value="priority:ASC">Priority ↑</option>
-          <option value="priority:DESC">Priority ↓</option>
-          <option value="title:ASC">Title A-Z</option>
-          <option value="title:DESC">Title Z-A</option>
-        </select>
-      </div>
-      {(tickets || []).length === 0 ? (
-        <p className="tickets-page__empty">No tickets found.</p>
-      ) : (
-        <table
-          className="tickets-page__table"
-          border="1"
-          cellPadding="10"
-          width="100%"
-        >
-          <thead>
-            <tr className="tickets-page__row tickets-page__row--head">
-              <th className="tickets-page__cell">ID</th>
-              <th className="tickets-page__cell">Title</th>
-              <th className="tickets-page__cell">Status</th>
-              <th className="tickets-page__cell">Priority</th>
-              <th className="tickets-page__cell">Category</th>
-              <th className="tickets-page__cell">Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {tickets.map((ticket) => (
-              <tr className="tickets-page__row" key={ticket.id}>
-                <td className="tickets-page__cell">{ticket.id}</td>
-                <td className="tickets-page__cell">{ticket.title}</td>
-                <td className="tickets-page__cell">{ticket.status}</td>
-                <td className="tickets-page__cell">{ticket.priority}</td>
-                <td className="tickets-page__cell">{ticket.category}</td>
-
-                <td className="tickets-page__cell tickets-page__cell--actions">
-                  <Link
-                    className="tickets-page__action-link"
-                    to={`/tickets/${ticket.id}`}
-                  >
-                    <button className="tickets-page__action-button">
-                      View
-                    </button>
-                  </Link>
-
-                  <Link
-                    className="tickets-page__action-link"
-                    to={`/tickets/edit/${ticket.id}`}
-                  >
-                    <button className="tickets-page__action-button">
-                      Edit
-                    </button>
-                  </Link>
-
-                  <button
-                    className="tickets-page__action-button"
-                    onClick={() => handleDelete(ticket.id)}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {error && (
+        <div className="tickets__error-banner">
+          {error}
+          <button
+            className="tickets__banner-close"
+            onClick={() => setError("")}
+          >
+            ✕
+          </button>
+        </div>
       )}
-      <div className="tickets-pagination">
-        <button
-          disabled={page === 1}
-          onClick={() => setPage((prev) => prev - 1)}
-        >
-          Previous
-        </button>
+      {success && (
+        <div className="tickets__success-banner">
+          {success}
+          <button
+            className="tickets__banner-close"
+            onClick={() => setSuccess("")}
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
-        <span>
-          Page {page} of {pagination.totalPages}
+      <div className="tickets__controls">
+        <div className="tickets__filters">
+          <input
+            type="text"
+            placeholder="🔍 Search tickets..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="tickets__search"
+          />
+
+          <select
+            value={priority}
+            onChange={(e) => setPriority(e.target.value)}
+            className="tickets__select"
+          >
+            <option value="">All Priorities</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+            <option value="urgent">Urgent</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div className="kanban-board">
+        {statuses.map((status) => (
+          <div key={status} className="kanban-column">
+            <div className="kanban-column__header">
+              <h3 className="kanban-column__title">
+                {status === "in_progress"
+                  ? "In Progress"
+                  : status.charAt(0).toUpperCase() + status.slice(1)}
+              </h3>
+              <span className="kanban-column__count">
+                {ticketsByStatus[status].length}
+              </span>
+            </div>
+
+            <div className="kanban-column__cards">
+              {ticketsByStatus[status].length === 0 ? (
+                <p className="kanban-column__empty">No tickets</p>
+              ) : (
+                ticketsByStatus[status].map((ticket) => (
+                  <KanbanCard
+                    key={ticket.id}
+                    ticket={ticket}
+                    onStatusChange={handleStatusChange}
+                    onDelete={handleDelete}
+                  />
+                ))
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function KanbanCard({ ticket, onStatusChange, onDelete }) {
+  const [showMenu, setShowMenu] = useState(false);
+  const statuses = ["open", "in_progress", "resolved", "closed"];
+  const nextStatuses = statuses.slice(statuses.indexOf(ticket.status) + 1);
+
+  const getPriorityColor = (priority) => {
+    const colors = {
+      low: "#4caf50",
+      medium: "#ff9800",
+      high: "#f44336",
+      urgent: "#9c27b0",
+    };
+    return colors[priority] || "#999";
+  };
+
+  return (
+    <div className="kanban-card">
+      <div className="kanban-card__header">
+        <Link to={`/tickets/${ticket.id}`}>
+          <h4 className="kanban-card__id">Ticket #{ticket.id}</h4>
+        </Link>
+        <button
+          className="kanban-card__menu-btn"
+          onClick={() => setShowMenu(!showMenu)}
+        >
+          ⋮
+        </button>
+        {showMenu && (
+          <div className="kanban-card__menu">
+            <button
+              className="kanban-card__menu-item"
+              onClick={() => onDelete(ticket.id)}
+            >
+              Delete
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div className="kanban-card__title-section">
+        <p className="kanban-card__ticket-title">{ticket.title}</p>
+      </div>
+
+      {/* <div className="kanban-card__field">
+        <strong className="kanban-card__label">Priority:</strong>
+        <span
+          className="kanban-card__priority-badge"
+          style={{ backgroundColor: getPriorityColor(ticket.priority) }}
+        >
+          {ticket.priority.charAt(0).toUpperCase() + ticket.priority.slice(1)}
         </span>
+      </div> */}
+{/* 
+      <div className="kanban-card__field">
+        <strong className="kanban-card__label">Requester:</strong>
+        <span className="kanban-card__value">
+          {ticket.requester?.name || "Unknown"}
+        </span>
+      </div> */}
 
-        <button
-          disabled={page >= pagination.totalPages}
-          onClick={() => setPage((prev) => prev + 1)}
-        >
-          Next
-        </button>
+      {/* <div className="kanban-card__field">
+        <strong className="kanban-card__label">Assignee:</strong>
+        <span className="kanban-card__value">
+          {ticket.assignee?.name || "Unassigned"}
+        </span>
+      </div> */}
+
+      <div className="kanban-card__field">
+        <strong className="kanban-card__label">Created:</strong>
+        <span className="kanban-card__value">
+          {new Date(ticket.createdAt).toLocaleDateString()}
+        </span>
+      </div>
+
+      <hr className="kanban-card__divider" />
+
+      <div className="kanban-card__actions">
+        <Link to={`/tickets/${ticket.id}`} className="kanban-card__link">
+          <button className="kanban-card__view-btn">View Details</button>
+        </Link>
+
+        {nextStatuses.length > 0 && (
+          <button
+            className="kanban-card__move-btn"
+            onClick={() => onStatusChange(ticket.id, nextStatuses[0])}
+          >
+            Move →
+          </button>
+        )}
       </div>
     </div>
   );

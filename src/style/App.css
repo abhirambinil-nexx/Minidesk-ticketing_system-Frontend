@@ -1,0 +1,60 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #f5f7fb;
+  font-family: "Inter", sans-serif;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* ===========================
+   Layout
+=========================== */
+.app-layout {
+  min-height: 100vh;
+}
+
+/* Sidebar + Content */
+
+.app-body {
+  display: flex;
+  margin-top: 70px;
+}
+
+/* Right Side */
+
+.app-main {
+  flex: 1;
+  margin-left: 240px;
+}
+
+/* Content */
+
+.app-content {
+  padding: 60px 0px;
+  min-height: calc(100vh - 70px);
+  background: #f5f7fb;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+  .app-body {
+    flex-direction: column;
+  }
+
+  .app-main {
+    margin-left: 0;
+  }
+
+  .app-content {
+    padding: 20px;
+  }
+}

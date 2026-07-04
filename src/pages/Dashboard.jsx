@@ -51,11 +51,8 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard">
-      <h1 className="dashboard__welcome">Welcome, {user?.name || "User"}</h1>
+    
 
-      <h3 className="dashboard__role">Role: {user?.role || "N/A"}</h3>
-
-      <hr className="dashboard__divider" />
 
       <div className="dashboard-grid">
         <DashboardCard title="Total Tickets" value={dashboard.total} />

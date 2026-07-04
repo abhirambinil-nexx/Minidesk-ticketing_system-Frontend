@@ -13,11 +13,6 @@
    Header
 =========================== */
 
-.dashboard__welcome {
-  font-size: 2rem;
-  color: #1e293b;
-  font-weight: 700;
-}
 
 .dashboard__role {
   margin-top: 8px;
@@ -26,11 +21,7 @@
   font-weight: 500;
 }
 
-.dashboard__divider {
-  margin: 30px 0;
-  border: none;
-  border-top: 1px solid #e5e7eb;
-}
+
 
 /* ===========================
    Dashboard Cards

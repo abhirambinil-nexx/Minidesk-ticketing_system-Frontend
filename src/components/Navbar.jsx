@@ -1,44 +1,51 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import Profile from "./Profile";
 import "../style/Navbar.css";
-export default function Navbar() {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const isAdmin = user?.role === "admin";
-  const navigate = useNavigate();
 
-  function handleLogout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/login");
-  }
+export default function Navbar() {
+  const [openProfile, setOpenProfile] = useState(false);
+
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   return (
-    <nav className="navbar">
-      <div className="navbar__left">
-        <strong className="navbar__brand">MiniDesk</strong>
-        <Link className="navbar__link" to="/dashboard">
-          Home
+    <header className="topbar">
+      <div className="topbar__left">
+        <Link to="/dashboard" className="navbar__brand">
+          MiniDesk
         </Link>
-        <Link className="navbar__link" to="/tickets">
-          View Tickets
-        </Link>
-        <Link className="navbar__link" to="/tickets/new">
-          Create Ticket
-        </Link>
-        {isAdmin && (
-          <Link className="navbar__link" to="/users">
-            Users
+        <div className="topbar__search-container">
+          <div className="topbar__search">
+            <span className="search-icon">🔍</span>
+
+            <input
+              type="text"
+              placeholder="Search tickets, users, categories..."
+            />
+          </div>
+          <Link to="/tickets/new">
+            <button className="topbar__create">+ Create</button>
           </Link>
-        )}
+        </div>
       </div>
 
-      <div className="navbar__right">
-        <span className="navbar__user">
-          {user?.name ? `${user.name} (${user.role || "user"})` : "User"}
-        </span>
-        <button className="navbar__logout" type="button" onClick={handleLogout}>
-          Logout
-        </button>
+      {/* Right */}
+      <div className="topbar__right">
+        <button className="topbar__icon">🔔</button>
+
+        <button className="topbar__icon">❔</button>
+
+        <div
+          className="topbar__profile"
+          onClick={() => setOpenProfile(!openProfile)}
+        >
+          <div className="profile-avatar">
+            {user?.name?.charAt(0).toUpperCase() || "U"}
+          </div>
+
+          {openProfile && <Profile close={() => setOpenProfile(false)} />}
+        </div>
       </div>
-    </nav>
+    </header>
   );
 }
