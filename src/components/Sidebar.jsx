@@ -19,6 +19,10 @@ export default function Sidebar() {
           Home
         </Link>
 
+        <Link className="sidebar__link" to="/spaces">
+          Spaces
+        </Link>
+
         <Link className="sidebar__link" to="/tickets">
           View Tickets
         </Link>

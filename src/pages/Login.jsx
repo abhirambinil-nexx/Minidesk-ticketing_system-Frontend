@@ -23,9 +23,13 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const data = await login(form);
-      const token = data.accessToken || data.token;
+      const response = await login(form);
 
+      console.log("Login Response:", response);
+
+      const data = response.data || response;
+
+      const token = data.accessToken || data.token;
       if (token) {
         localStorage.setItem("accessToken", token);
         localStorage.setItem("token", token);
@@ -35,6 +39,9 @@ export default function Login() {
         }
 
         alert("Login Successful");
+        console.log("Navigating to dashboard...");
+        console.log("Token:", localStorage.getItem("accessToken"));
+        console.log("User:", localStorage.getItem("user"));
         navigate("/dashboard", { replace: true });
       } else {
         alert(data.message || "Invalid credentials");

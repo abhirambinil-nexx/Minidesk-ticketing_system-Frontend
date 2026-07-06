@@ -1,7 +1,7 @@
 const API_URL = "http://localhost:5000/api/tickets";
 
 function getToken() {
-  return localStorage.getItem("token");
+  return localStorage.getItem("accessToken") || localStorage.getItem("token");
 }
 
 export async function getTickets(filters = {}) {
@@ -21,7 +21,7 @@ export async function getTickets(filters = {}) {
 
   return await response.json();
 }
-  
+
 export async function getTicket(id) {
   const response = await fetch(`${API_URL}/${id}`, {
     headers: {
@@ -65,6 +65,31 @@ export async function deleteTicket(id) {
       Authorization: `Bearer ${getToken()}`,
     },
   });
+
+  return await response.json();
+}
+
+// =============================================
+// Get Tickets By Space
+// =============================================
+
+export async function getSpaceTickets(key, filters = {}) {
+  const params = new URLSearchParams();
+
+  Object.entries(filters).forEach(([k, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      params.append(k, value);
+    }
+  });
+
+  const response = await fetch(
+    `http://localhost:5000/api/spaces/${key}/tickets?${params.toString()}`,
+    {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    },
+  );
 
   return await response.json();
 }
