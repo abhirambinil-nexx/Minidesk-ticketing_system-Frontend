@@ -4,6 +4,19 @@ function getToken() {
   return localStorage.getItem("accessToken") || localStorage.getItem("token");
 }
 
+async function requestJson(url, options = {}) {
+  const response = await fetch(url, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${getToken()}`,
+      ...options.headers,
+    },
+    ...options,
+  });
+
+  return await response.json();
+}
+
 export async function getTickets(filters = {}) {
   const params = new URLSearchParams();
 
@@ -23,13 +36,18 @@ export async function getTickets(filters = {}) {
 }
 
 export async function getTicket(id) {
-  const response = await fetch(`${API_URL}/${id}`, {
-    headers: {
-      Authorization: `Bearer ${getToken()}`,
-    },
-  });
+  return requestJson(`${API_URL}/${id}`);
+}
 
-  return await response.json();
+export async function getTicketDetails(id) {
+  return requestJson(`${API_URL}/${id}`);
+}
+
+export async function updateTicketDetails(id, ticket) {
+  return requestJson(`${API_URL}/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(ticket),
+  });
 }
 
 export async function createTicket(ticket) {
@@ -46,16 +64,21 @@ export async function createTicket(ticket) {
 }
 
 export async function updateTicket(id, ticket) {
-  const response = await fetch(`${API_URL}/${id}`, {
+  return requestJson(`${API_URL}/${id}`, {
     method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${getToken()}`,
-    },
     body: JSON.stringify(ticket),
   });
+}
 
-  return await response.json();
+export async function getTicketComments(ticketId) {
+  return requestJson(`${API_URL}/${ticketId}/comments`);
+}
+
+export async function createComment(ticketId, body) {
+  return requestJson(`${API_URL}/${ticketId}/comments`, {
+    method: "POST",
+    body: JSON.stringify({ body }),
+  });
 }
 
 export async function deleteTicket(id) {

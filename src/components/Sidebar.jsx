@@ -23,13 +23,6 @@ export default function Sidebar() {
           Spaces
         </Link>
 
-        <Link className="sidebar__link" to="/tickets">
-          View Tickets
-        </Link>
-
-        <Link className="sidebar__link" to="/tickets/new">
-          Create Ticket
-        </Link>
 
         {isAdmin && (
           <Link className="sidebar__link" to="/users">

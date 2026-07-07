@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getTickets, updateTicket, deleteTicket } from "../api/ticket";
 import { Link } from "react-router-dom";
+import TicketDrawer from "../components/TicketDrawer/TicketDrawer";
 import "../style/Tickets.css";
 
 function Tickets() {
@@ -10,6 +11,8 @@ function Tickets() {
   const [priority, setPriority] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [selectedTicket, setSelectedTicket] = useState(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const statuses = ["open", "in_progress", "resolved", "closed"];
 
@@ -56,6 +59,24 @@ function Tickets() {
       console.error(err);
       setError("Failed to update status");
     }
+  }
+
+  function handleOpenTicket(ticket) {
+    setSelectedTicket(ticket);
+    setDrawerOpen(true);
+  }
+
+  function handleDrawerClose() {
+    setSelectedTicket(null);
+    setDrawerOpen(false);
+  }
+
+  function handleTicketUpdated(updatedTicket) {
+    setAllTickets((prev) =>
+      prev.map((ticket) =>
+        ticket.id === updatedTicket.id ? updatedTicket : ticket,
+      ),
+    );
   }
 
   async function handleDelete(id) {
@@ -147,7 +168,6 @@ function Tickets() {
             <option value="urgent">Urgent</option>
           </select>
         </div>
-
       </div>
 
       <div className="kanban-board">
@@ -174,6 +194,7 @@ function Tickets() {
                     ticket={ticket}
                     onStatusChange={handleStatusChange}
                     onDelete={handleDelete}
+                    onOpenTicket={handleOpenTicket}
                   />
                 ))
               )}
@@ -181,11 +202,18 @@ function Tickets() {
           </div>
         ))}
       </div>
+
+      <TicketDrawer
+        open={drawerOpen}
+        ticket={selectedTicket}
+        onClose={handleDrawerClose}
+        onTicketUpdated={handleTicketUpdated}
+      />
     </div>
   );
 }
 
-function KanbanCard({ ticket, onStatusChange, onDelete }) {
+function KanbanCard({ ticket, onStatusChange, onDelete, onOpenTicket }) {
   const [showMenu, setShowMenu] = useState(false);
   const statuses = ["open", "in_progress", "resolved", "closed"];
   const nextStatuses = statuses.slice(statuses.indexOf(ticket.status) + 1);
@@ -201,22 +229,44 @@ function KanbanCard({ ticket, onStatusChange, onDelete }) {
   };
 
   return (
-    <div className="kanban-card">
+    <div
+      className="kanban-card"
+      onClick={() => onOpenTicket(ticket)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onOpenTicket(ticket);
+        }
+      }}
+    >
       <div className="kanban-card__header">
-        <Link to={`/tickets/${ticket.id}`}>
-          <h4 className="kanban-card__id">Ticket #{ticket.id}</h4>
-        </Link>
+        <div>
+          <h4 className="kanban-card__id">
+            {ticket.ticketKey || `#${ticket.id}`}
+          </h4>
+          <p className="kanban-card__ticket-title">{ticket.title}</p>
+        </div>
         <button
+          type="button"
           className="kanban-card__menu-btn"
-          onClick={() => setShowMenu(!showMenu)}
+          onClick={(event) => {
+            event.stopPropagation();
+            setShowMenu(!showMenu);
+          }}
         >
           ⋮
         </button>
         {showMenu && (
           <div className="kanban-card__menu">
             <button
+              type="button"
               className="kanban-card__menu-item"
-              onClick={() => onDelete(ticket.id)}
+              onClick={(event) => {
+                event.stopPropagation();
+                onDelete(ticket.id);
+              }}
             >
               Delete
             </button>
@@ -224,52 +274,48 @@ function KanbanCard({ ticket, onStatusChange, onDelete }) {
         )}
       </div>
 
-      <div className="kanban-card__title-section">
-        <p className="kanban-card__ticket-title">{ticket.title}</p>
-      </div>
-
-      {/* <div className="kanban-card__field">
-        <strong className="kanban-card__label">Priority:</strong>
+      <div className="kanban-card__meta">
         <span
           className="kanban-card__priority-badge"
           style={{ backgroundColor: getPriorityColor(ticket.priority) }}
         >
-          {ticket.priority.charAt(0).toUpperCase() + ticket.priority.slice(1)}
+          {ticket.priority?.charAt(0).toUpperCase() +
+            ticket.priority?.slice(1) || "Medium"}
         </span>
-      </div> */}
-{/* 
-      <div className="kanban-card__field">
-        <strong className="kanban-card__label">Requester:</strong>
-        <span className="kanban-card__value">
-          {ticket.requester?.name || "Unknown"}
+        <span className="kanban-card__assignee">
+          {ticket.assignee?.name?.charAt(0)?.toUpperCase() || "U"}
         </span>
-      </div> */}
-
-      {/* <div className="kanban-card__field">
-        <strong className="kanban-card__label">Assignee:</strong>
-        <span className="kanban-card__value">
-          {ticket.assignee?.name || "Unassigned"}
-        </span>
-      </div> */}
+      </div>
 
       <div className="kanban-card__field">
-        <strong className="kanban-card__label">Created:</strong>
+        <strong className="kanban-card__label">Due:</strong>
         <span className="kanban-card__value">
-          {new Date(ticket.createdAt).toLocaleDateString()}
+          {ticket.dueDate ? new Date(ticket.dueDate).toLocaleDateString() : "—"}
         </span>
       </div>
 
       <hr className="kanban-card__divider" />
 
       <div className="kanban-card__actions">
-        <Link to={`/tickets/${ticket.id}`} className="kanban-card__link">
-          <button className="kanban-card__view-btn">View Details</button>
-        </Link>
+        <button
+          type="button"
+          className="kanban-card__view-btn"
+          onClick={(event) => {
+            event.stopPropagation();
+            onOpenTicket(ticket);
+          }}
+        >
+          Open
+        </button>
 
         {nextStatuses.length > 0 && (
           <button
+            type="button"
             className="kanban-card__move-btn"
-            onClick={() => onStatusChange(ticket.id, nextStatuses[0])}
+            onClick={(event) => {
+              event.stopPropagation();
+              onStatusChange(ticket.id, nextStatuses[0]);
+            }}
           >
             Move →
           </button>

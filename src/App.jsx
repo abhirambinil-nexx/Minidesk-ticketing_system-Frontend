@@ -62,7 +62,6 @@ export default function App() {
           <Route path="/spaces" element={<Spaces />} />
 
           <Route path="/spaces/new" element={<CreateSpace />} />
-
           <Route path="/spaces/:key" element={<Space />} />
 
           <Route path="/spaces/edit/:key" element={<EditSpace />} />
