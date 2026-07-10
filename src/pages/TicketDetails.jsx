@@ -171,7 +171,8 @@
 // }
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { deleteTicket, getTicket } from "../api/ticket";
+import { deleteTicket, getTicket, getTicketActivity } from "../api/ticket";
+import ActivityTimeline from "../components/ActivityTimeline";
 import "../style/TicketDetails.css";
 
 export default function TicketDetails() {
@@ -179,9 +180,15 @@ export default function TicketDetails() {
   const navigate = useNavigate();
 
   const [ticket, setTicket] = useState(null);
+  const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activityLoading, setActivityLoading] = useState(true);
   const [error, setError] = useState("");
   const [deleting, setDeleting] = useState(false);
+
+  const backPath = ticket?.space?.key
+    ? `/spaces/${ticket.space.key}`
+    : "/tickets";
 
   useEffect(() => {
     fetchTicket();
@@ -191,10 +198,17 @@ export default function TicketDetails() {
   async function fetchTicket() {
     try {
       setLoading(true);
+      setActivityLoading(true);
       const response = await getTicket(id);
 
       if (response.success) {
         setTicket(response.data);
+        const activityResponse = await getTicketActivity(id);
+        if (activityResponse.success) {
+          setActivities(activityResponse.data || []);
+        } else {
+          setActivities([]);
+        }
       } else {
         setError(response.message || "Ticket not found");
       }
@@ -203,6 +217,7 @@ export default function TicketDetails() {
       setError("Failed to load ticket");
     } finally {
       setLoading(false);
+      setActivityLoading(false);
     }
   }
 
@@ -214,7 +229,7 @@ export default function TicketDetails() {
       const response = await deleteTicket(id);
 
       if (response.success) {
-        navigate("/tickets");
+        navigate(backPath);
       } else {
         setError(response.message);
       }
@@ -299,7 +314,7 @@ export default function TicketDetails() {
         </div>
 
         <div className="ticket-header-actions">
-          <Link to="/tickets">
+          <Link to={backPath}>
             <button className="btn-secondary">← Back</button>
           </Link>
 
@@ -326,32 +341,14 @@ export default function TicketDetails() {
             <p>{ticket.description || "No description provided."}</p>
           </section>
 
-          {/* Comments */}
-          <section className="ticket-card">
-            <div className="ticket-section-header">
-              <h2>Comments</h2>
-              <button className="btn-primary btn-small">Add Comment</button>
-            </div>
-
-            {ticket.comments?.length ? (
-              ticket.comments.map((comment) => (
-                <div key={comment.id} className="comment-card">
-                  <div className="comment-header">
-                    <strong>{comment.user?.name}</strong>
-                    <span>{new Date(comment.createdAt).toLocaleString()}</span>
-                  </div>
-                  <p>{comment.comment}</p>
-                </div>
-              ))
-            ) : (
-              <div className="empty-section">No comments yet.</div>
-            )}
-          </section>
-
           {/* Activity */}
           <section className="ticket-card">
             <h2>Activity</h2>
-            <div className="empty-section">No activity available.</div>
+            {activityLoading ? (
+              <div className="empty-section">Loading activity...</div>
+            ) : (
+              <ActivityTimeline activities={activities} />
+            )}
           </section>
 
           {/* Status History */}

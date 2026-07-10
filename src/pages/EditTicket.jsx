@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getTicket, updateTicket } from "../api/ticket";
-import { getAgents } from "../api/user";
+import { getMembers } from "../api/spaceMember";
 // import "../style/EditTicket.css";
 
 export default function EditTicket() {
@@ -17,14 +17,14 @@ export default function EditTicket() {
     assigneeId: "",
   });
 
-  const [agents, setAgents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [spaceMembers, setSpaceMembers] = useState([]);
+  const [memberSearch, setMemberSearch] = useState("");
 
   useEffect(() => {
     fetchTicket();
-    fetchAgents();
   }, []);
 
   async function fetchTicket() {
@@ -32,14 +32,31 @@ export default function EditTicket() {
       const response = await getTicket(id);
 
       if (response.success) {
+        const ticket = response.data;
         setForm({
-          title: response.data.title,
-          description: response.data.description,
-          category: response.data.category || "",
-          priority: response.data.priority,
-          status: response.data.status,
-          assigneeId: response.data.assigneeId || "",
+          title: ticket.title,
+          description: ticket.description,
+          category: ticket.category || "",
+          priority: ticket.priority,
+          status: ticket.status,
+          assigneeId: ticket.assigneeId || "",
         });
+        setMemberSearch("");
+
+        if (ticket.space?.key) {
+          const membersResponse = await getMembers(ticket.space.key);
+          if (membersResponse.success) {
+            setSpaceMembers(
+              (membersResponse.data || []).filter((member) =>
+                ["admin", "agent"].includes(member.role),
+              ),
+            );
+          } else {
+            setSpaceMembers([]);
+          }
+        } else {
+          setSpaceMembers([]);
+        }
       } else {
         setError(response.message || "Ticket not found.");
       }
@@ -51,24 +68,12 @@ export default function EditTicket() {
     }
   }
 
-  async function fetchAgents() {
-    try {
-      const response = await getAgents();
-
-      if (response.success) {
-        setAgents(response.data);
-      }
-    } catch (err) {
-      console.error("Failed to load agents:", err);
-    }
-  }
-
   function handleChange(e) {
     const { name, value } = e.target;
 
     setForm((prev) => ({
       ...prev,
-      [name]: name === "assigneeId" ? (value === "" ? null : Number(value)) : value,
+      [name]: value,
     }));
   }
 
@@ -83,7 +88,15 @@ export default function EditTicket() {
     setSaving(true);
 
     try {
-      const response = await updateTicket(id, form);
+      const payload = {
+        ...form,
+        assigneeId:
+          form.assigneeId === "" || form.assigneeId === null
+            ? null
+            : Number(form.assigneeId),
+      };
+
+      const response = await updateTicket(id, payload);
 
       if (response.success) {
         alert("Ticket updated successfully.");
@@ -186,6 +199,14 @@ export default function EditTicket() {
         <div className="edit-ticket__field">
           <label className="edit-ticket__label">Assign To</label>
 
+          <input
+            className="edit-ticket__input"
+            type="search"
+            placeholder="Search space members..."
+            value={memberSearch}
+            onChange={(e) => setMemberSearch(e.target.value)}
+          />
+
           <select
             className="edit-ticket__select"
             name="assigneeId"
@@ -194,11 +215,24 @@ export default function EditTicket() {
           >
             <option value="">Unassigned</option>
 
-            {agents.map((agent) => (
-              <option key={agent.id} value={agent.id}>
-                {agent.name} ({agent.role})
-              </option>
-            ))}
+            {spaceMembers
+              .filter((member) => {
+                if (!memberSearch.trim()) return true;
+                const search = memberSearch.toLowerCase();
+                const name = (member.name || "").toLowerCase();
+                const email = (member.email || "").toLowerCase();
+                return (
+                  name.includes(search) ||
+                  email.includes(search) ||
+                  String(member.role || "").toLowerCase().includes(search)
+                );
+              })
+              .map((member) => (
+                <option key={member.id} value={member.userId || member.id}>
+                  {member.name || member.user?.name || "Unknown"} (
+                  {member.role})
+                </option>
+              ))}
           </select>
         </div>
 

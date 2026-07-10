@@ -1,3 +1,189 @@
+/* =========================
+   Create Ticket Page
+========================= */
+
 .create-ticket {
-  padding: 30px;
+  max-width: 850px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.create-ticket__title {
+  font-size: 36px;
+  font-weight: 700;
+  color: #172b4d;
+  margin-bottom: 30px;
+}
+
+/* Card */
+
+.create-ticket__form {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 35px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
+  border: 1px solid #edf1f7;
+}
+
+/* Fields */
+
+.create-ticket__field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 22px;
+}
+
+.create-ticket__label,
+.create-ticket__field label {
+  font-size: 15px;
+  font-weight: 600;
+  color: #344054;
+  margin-bottom: 8px;
+}
+
+/* Inputs */
+
+.create-ticket__input,
+.create-ticket__textarea,
+.create-ticket__select {
+  width: 100%;
+  padding: 13px 15px;
+  font-size: 15px;
+  border: 1px solid #d9dee7;
+  border-radius: 10px;
+  outline: none;
+  background: white;
+  transition: 0.2s;
+  font-family: inherit;
+}
+
+.create-ticket__textarea {
+  resize: vertical;
+  min-height: 140px;
+}
+
+.create-ticket__input:focus,
+.create-ticket__textarea:focus,
+.create-ticket__select:focus {
+  border-color: #2f6fed;
+  box-shadow: 0 0 0 3px rgba(47, 111, 237, 0.15);
+}
+
+/* Placeholder */
+
+.create-ticket__input::placeholder,
+.create-ticket__textarea::placeholder {
+  color: #98a2b3;
+}
+
+/* Tags */
+
+.tag-select {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tag-item {
+  background: #edf2ff;
+  color: #3659e3;
+  padding: 8px 14px;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: .2s;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.tag-item:hover {
+  background: #dbe5ff;
+}
+
+.tag-item.active {
+  background: #2f6fed;
+  color: white;
+}
+
+/* Buttons */
+
+.create-ticket__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 35px;
+}
+
+.create-ticket__button,
+.create-ticket button[type="submit"] {
+  background: #2f6fed;
+  color: white;
+  border: none;
+  padding: 13px 28px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.create-ticket__button:hover,
+.create-ticket button[type="submit"]:hover {
+  background: #1e56d0;
+}
+
+.create-ticket__button:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+/* Secondary button */
+
+.create-ticket__cancel {
+  background: white;
+  border: 1px solid #d9dee7;
+  color: #344054;
+}
+
+.create-ticket__cancel:hover {
+  background: #f8f9fc;
+}
+
+/* Required */
+
+.required {
+  color: #e53935;
+}
+
+/* Validation */
+
+.error-text {
+  color: #d32f2f;
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+
+  .create-ticket {
+    margin: 20px auto;
+  }
+
+  .create-ticket__form {
+    padding: 24px;
+  }
+
+  .create-ticket__title {
+    font-size: 28px;
+  }
+
+  .create-ticket__actions {
+    flex-direction: column;
+  }
+
+  .create-ticket__button {
+    width: 100%;
+  }
+
 }

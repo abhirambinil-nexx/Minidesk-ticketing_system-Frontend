@@ -115,12 +115,6 @@ function Tickets() {
     <div className="tickets-container">
       <div className="tickets__header">
         <h1 className="tickets__title">Tickets</h1>
-
-        <div className="tickets__header-actions">
-          <Link to="/tickets/new">
-            <button className="tickets__create-btn">+ Create Ticket</button>
-          </Link>
-        </div>
       </div>
 
       {error && (

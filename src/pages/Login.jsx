@@ -1,16 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import { googleLogin, login } from "../api/auth";
-import { Link, useNavigate } from "react-router-dom";
+import { acceptInvitation } from "../api/invitation";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import "../style/Login.css";
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const query = new URLSearchParams(location.search);
+  const inviteEmail = query.get("email") || sessionStorage.getItem("pendingInviteEmail") || "";
 
   const [form, setForm] = useState({
     email: "",
     password: "",
   });
+
+  useEffect(() => {
+    if (inviteEmail) {
+      setForm((prev) => ({ ...prev, email: inviteEmail }));
+    }
+  }, [inviteEmail]);
 
   const handleChange = (e) => {
     setForm({
@@ -38,11 +48,28 @@ export default function Login() {
           localStorage.setItem("user", JSON.stringify(data.user));
         }
 
+        const pendingInviteToken = sessionStorage.getItem("pendingInviteToken");
+        if (pendingInviteToken) {
+          const inviteResponse = await acceptInvitation(pendingInviteToken);
+
+          if (inviteResponse.success) {
+            sessionStorage.removeItem("pendingInviteToken");
+            sessionStorage.removeItem("pendingInviteEmail");
+            const spaceKey =
+              inviteResponse.data?.invitation?.space?.key ||
+              inviteResponse.data?.invitation?.space?.id;
+            navigate(spaceKey ? `/spaces/${spaceKey}` : "/dashboard", {
+              replace: true,
+            });
+            return;
+          }
+        }
+
         alert("Login Successful");
-        console.log("Navigating to dashboard...");
-        console.log("Token:", localStorage.getItem("accessToken"));
-        console.log("User:", localStorage.getItem("user"));
-        navigate("/dashboard", { replace: true });
+        const redirectTo = new URLSearchParams(location.search).get("invite")
+          ? "/dashboard"
+          : "/dashboard";
+        navigate(redirectTo, { replace: true });
       } else {
         alert(data.message || "Invalid credentials");
       }
@@ -63,14 +90,15 @@ export default function Login() {
           </p>
 
           <form className="login-page__form" onSubmit={handleSubmit}>
-            <input
-              className="login-page__input"
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={form.email}
-              onChange={handleChange}
-            />
+              <input
+                className="login-page__input"
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={form.email}
+                onChange={handleChange}
+                readOnly={Boolean(inviteEmail)}
+              />
 
             <input
               className="login-page__input"
@@ -109,6 +137,25 @@ export default function Login() {
                               "user",
                               JSON.stringify(data.user),
                             );
+                          }
+
+                          const pendingInviteToken =
+                            sessionStorage.getItem("pendingInviteToken");
+                          if (pendingInviteToken) {
+                            sessionStorage.removeItem("pendingInviteToken");
+                            const inviteResponse =
+                              await acceptInvitation(pendingInviteToken);
+
+                            if (inviteResponse.success) {
+                              const spaceKey =
+                                inviteResponse.data?.invitation?.space?.key ||
+                                inviteResponse.data?.invitation?.space?.id;
+                              navigate(
+                                spaceKey ? `/spaces/${spaceKey}` : "/dashboard",
+                                { replace: true },
+                              );
+                              return;
+                            }
                           }
 
                           alert(data.message || "Google login successful");

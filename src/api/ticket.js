@@ -43,6 +43,10 @@ export async function getTicketDetails(id) {
   return requestJson(`${API_URL}/${id}`);
 }
 
+export async function getTicketActivity(id) {
+  return requestJson(`${API_URL}/${id}/activity`);
+}
+
 export async function updateTicketDetails(id, ticket) {
   return requestJson(`${API_URL}/${id}`, {
     method: "PATCH",

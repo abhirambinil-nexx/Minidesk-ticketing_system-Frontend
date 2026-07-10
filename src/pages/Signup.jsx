@@ -1,16 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import { googleLogin, signup } from "../api/auth";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import "../style/Signup.css";
 export default function Signup() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const query = new URLSearchParams(location.search);
+  const inviteEmail = query.get("email") || sessionStorage.getItem("pendingInviteEmail") || "";
 
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
   });
+
+  useEffect(() => {
+    if (inviteEmail) {
+      setForm((prev) => ({ ...prev, email: inviteEmail }));
+    }
+  }, [inviteEmail]);
 
   const handleChange = (e) => {
     setForm({
@@ -69,13 +78,15 @@ export default function Signup() {
             />
 
             <label className="signup-page__label">Email Address</label>
-            <input
-              className="signup-page__input"
-              type="email"
-              name="email"
-              placeholder="Enter your email"
-              onChange={handleChange}
-            />
+              <input
+                className="signup-page__input"
+                type="email"
+                name="email"
+                placeholder="Enter your email"
+                value={form.email}
+                onChange={handleChange}
+                readOnly={Boolean(inviteEmail)}
+              />
 
             <label className="signup-page__label">Password</label>
             <input
@@ -115,6 +126,29 @@ export default function Signup() {
                               "user",
                               JSON.stringify(data.user),
                             );
+                          }
+
+                          const pendingInviteToken =
+                            sessionStorage.getItem("pendingInviteToken");
+                          if (pendingInviteToken) {
+                            const { acceptInvitation } = await import(
+                              "../api/invitation"
+                            );
+                            const inviteResponse =
+                              await acceptInvitation(pendingInviteToken);
+
+                            if (inviteResponse.success) {
+                              sessionStorage.removeItem("pendingInviteToken");
+                              sessionStorage.removeItem("pendingInviteEmail");
+                              const spaceKey =
+                                inviteResponse.data?.invitation?.space?.key ||
+                                inviteResponse.data?.invitation?.space?.id;
+                              navigate(
+                                spaceKey ? `/spaces/${spaceKey}` : "/dashboard",
+                                { replace: true },
+                              );
+                              return;
+                            }
                           }
 
                           alert(data.message || "Google signup successful");

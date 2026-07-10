@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getDashboard } from "../api/dashboard";
 import DashboardCard from "../components/DashboardCard";
+import ForYouSection from "../components/dashboard/ForYouSection";
 import "../style/Dashboard.css";
 
 export default function Dashboard() {
@@ -51,9 +52,6 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard">
-    
-
-
       <div className="dashboard-grid">
         <DashboardCard title="Total Tickets" value={dashboard.total} />
         <DashboardCard title="Open" value={dashboard.open} />
@@ -62,6 +60,8 @@ export default function Dashboard() {
         <DashboardCard title="Closed" value={dashboard.closed} />
         <DashboardCard title="Urgent" value={dashboard.urgent} />
       </div>
+
+      <ForYouSection tickets={dashboard.assignedTickets || []} />
 
       <h2 className="dashboard__section-title">Recent Tickets</h2>
 

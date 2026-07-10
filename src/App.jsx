@@ -24,6 +24,7 @@ import Navbar from "./components/Navbar";
 import CreateSpace from "./pages/CreateSpace";
 import Space from "./pages/Space";
 import EditSpace from "./pages/EditSpace";
+import AcceptInvite from "./pages/AcceptInvite";
 
 import "./style/App.css";
 
@@ -55,6 +56,8 @@ export default function App() {
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/accept-invite/:token" element={<AcceptInvite />} />
+        <Route path="/invitations/accept/:token" element={<AcceptInvite />} />
 
         {/* Protected Routes */}
         <Route element={<ProtectedLayout />}>
