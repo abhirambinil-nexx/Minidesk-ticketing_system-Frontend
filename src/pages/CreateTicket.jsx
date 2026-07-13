@@ -71,11 +71,7 @@ export default function CreateTicket() {
 
       if (response.success) {
         const members = Array.isArray(response.data) ? response.data : [];
-        setSpaceMembers(
-          members.filter((member) =>
-            ["admin", "agent"].includes(member.role),
-          ),
-        );
+        setSpaceMembers(members);
       } else {
         setSpaceMembers([]);
       }

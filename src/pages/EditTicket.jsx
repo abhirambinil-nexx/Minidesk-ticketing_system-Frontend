@@ -46,11 +46,7 @@ export default function EditTicket() {
         if (ticket.space?.key) {
           const membersResponse = await getMembers(ticket.space.key);
           if (membersResponse.success) {
-            setSpaceMembers(
-              (membersResponse.data || []).filter((member) =>
-                ["admin", "agent"].includes(member.role),
-              ),
-            );
+            setSpaceMembers(membersResponse.data || []);
           } else {
             setSpaceMembers([]);
           }
@@ -228,7 +224,10 @@ export default function EditTicket() {
                 );
               })
               .map((member) => (
-                <option key={member.id} value={member.userId || member.id}>
+                <option
+                  key={member.id}
+                  value={member.userId || member.user?.id || member.id}
+                >
                   {member.name || member.user?.name || "Unknown"} (
                   {member.role})
                 </option>
